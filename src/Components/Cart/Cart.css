@@ -1,0 +1,157 @@
+.CartTitle {
+  margin-top: 50px;
+  font-weight: normal;
+  margin-bottom: 50px;
+  font-weight: bold;
+  font-size: large;
+}
+
+hr {
+  color: black;
+  background-color: black;
+  opacity: 20%;
+}
+
+.CartContainer {
+  display: grid;
+  grid-template-columns: 75.5% 2.5% 21%;
+  gap: 0.4rem;
+}
+
+.Title {
+  font-weight: bold;
+}
+
+.SubTitle {
+  margin-top: 6px;
+}
+
+.Price {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.Size {
+  margin-top: 10px;
+  font-size: small;
+  font-weight: bold;
+}
+
+.Color {
+  margin-top: 10px;
+  font-size: small;
+  font-weight: bold;
+}
+
+.SizeBlocks {
+  margin-top: 2px;
+  display: flex;
+  gap: 0.2rem;
+}
+
+.SizeBlock {
+  width: fit-content;
+  padding: 5px;
+  height: 20px;
+  border: 1px solid black;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ActiveSize {
+  color: whitesmoke;
+  background-color: black;
+}
+
+.ColorBlocks {
+  margin-top: 2px;
+  display: flex;
+  gap: 0.2rem;
+  cursor: pointer;
+}
+
+.Gray {
+  width: 20px;
+  height: 20px;
+  background-color: gray;
+}
+
+.Black {
+  width: 20px;
+  height: 20px;
+  background-color: black;
+}
+
+.Green {
+  width: 20px;
+  height: 20px;
+  background-color: green;
+}
+
+.ActiveColor {
+  border: 2.5px solid green;
+}
+
+.CartImageContainer {
+  text-align: right;
+ 
+}
+
+.CartImage {
+  position: relative;
+}
+
+.LeftRightContainer {
+  position: absolute;
+  bottom: 15px;
+  right: 30px;
+  cursor: pointer;
+}
+
+.PlusButton {
+  width: 20px;
+  padding: 5px;
+  height: 20px;
+  border: 1px solid black;
+  text-align: center;
+}
+
+.MinusButton {
+  width: 20px;
+  padding: 5px;
+  height: 20px;
+  border: 1px solid black;
+  text-align: center;
+}
+
+.CountContent {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.BillContainer {
+  margin-top: 30px;
+}
+
+.CartButton {
+  margin-top: 20px;
+  width: 200px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: green;
+  cursor: pointer;
+}
+
+.CartButton:hover {
+  background-color: darkgreen;
+}
+
+.BtnText {
+  color: white;
+  font-size: small;
+}

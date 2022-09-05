@@ -1,0 +1,101 @@
+.Container {
+  height: 50px;
+}
+
+.Wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav {
+  display: flex;
+  max-width: 100%;
+  justify-content: space-between;
+  border: 1px solid white;
+}
+
+nav li {
+  padding: 10px;
+  cursor: pointer;
+  position: relative;
+  text-align: center;
+}
+
+.navLink {
+  text-decoration: none;
+}
+
+.active::after {
+  position: absolute;
+  content: "";
+  height: 3px;
+  width: 100%;
+  background-color: green;
+  left: 0;
+  bottom: -10px;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  animation: appear 0.2s linear;
+}
+@keyframes appear {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.Center {
+  cursor: pointer;
+}
+
+.IconCurrency {
+  margin-right: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.Options {
+  cursor: pointer;
+  position: absolute;
+  z-index: 3;
+  top: 60px;
+  background-color: white;
+  color: black;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 0px 0px 10px -5px rgba(0, 0, 0, 0.4);
+}
+
+.OptionItem {
+  width: 100px;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+
+}
+
+.OptionItem:hover {
+  background-color: #eeeeee;
+}
+
+.IconCart {
+  cursor: pointer;
+}
+
+.CartCount {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  font-size: 8px;
+  background-color: black;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 26px;
+  right: 71px;
+}

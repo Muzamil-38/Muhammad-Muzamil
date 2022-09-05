@@ -1,0 +1,86 @@
+.SectionContainer {
+    margin-top: 50px;
+  }
+  
+  .SectionTitle {
+    font-weight: normal;
+    margin-bottom: 80px;
+  }
+  
+  .ProductSection {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4rem;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .ProductContent {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    opacity: 60%;
+  }
+  
+  .StockStatus {
+    position: absolute;
+    font-size: 50px;
+    color: black;
+    opacity:60%;
+  }
+  
+  .ProductTitle {
+    font-weight: normal;
+    margin-bottom: 1.5px;
+    text-align: left;
+  }
+  
+  .Price {
+    font-weight: bold;
+    text-align: left;
+  }
+  
+  .ProductBox {
+    cursor: pointer;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .ProductBox:hover {
+    padding: 15px;
+    box-shadow: 0 0 11px rgba(33, 33, 33, 0.2);
+    transition: 0.5s;
+  }
+  
+  .CartIconContainer {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: green;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    padding: 2px;
+    position: absolute;
+    bottom: -10px;
+    left: 300px;
+    opacity: 0;
+  }
+  
+  .CartIconContainer:hover {
+    transform: scale(1.1);
+    transition: all 0.2s ease-out;
+  }
+  
+  .ImageContainer {
+    position: relative;
+  }
+  
+  .ImageContainer:hover .CartIconContainer {
+    opacity: 1;
+  }
+  .Img{
+    width: 100%;
+  }
+  
