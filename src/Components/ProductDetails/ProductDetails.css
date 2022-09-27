@@ -113,6 +113,16 @@ img {
   cursor: pointer;
 }
 
+.DisabledContentButton{
+  margin-top: 20px;
+  width: 280px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #cccccc;
+}
+
 .ContentButton:hover {
   background-color: darkgreen;
 }
@@ -125,3 +135,14 @@ img {
   width: 58%;
   margin-top: 40px;
 }
+
+.ProductDetailsImage{
+  height: 500px;
+  width: 400px;
+}
+
+.ProductDetailsImages{
+  height: 80px;
+  width: 80px;
+}
+

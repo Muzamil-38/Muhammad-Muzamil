@@ -1,9 +1,7 @@
 import React from "react";
 import "./ProductDetails.css";
 import { connect } from "react-redux";
-import { addToCart, getTotal } from "../../Redux/cartSlice";
-import { addAttributes, removeAttributes } from "../../Redux/attSlice";
-
+import { addToCart, getTotal, attrHandle } from "../../Redux/cartSlice";
 import { useParams } from "react-router";
 
 function usingHooks(ProductDetails) {
@@ -13,16 +11,25 @@ function usingHooks(ProductDetails) {
   };
 }
 
-class ProductDetails extends React.Component {
+class ProductDetails extends React.PureComponent {
   constructor(props) {
     super(props);
+
     this.state = {
       index: 0,
+      selectedAttr: [],
+      data: [],
     };
   }
+  state = {};
+
   handleAddToCart = (product) => {
-    this.props.addToCart(product);
-    this.props.getTotal();
+    if (this.props.selectedAttr.length === 0) {
+      alert("Kindly Select Attributes");
+    } else {
+      this.props.addToCart(product);
+      this.props.getTotal();
+    }
   };
 
   removeHTML = (str) => {
@@ -35,19 +42,66 @@ class ProductDetails extends React.Component {
     this.setState({ index: index });
   };
 
-  attHandle = (value) => {
-    if (this.props.attSelected.includes(value)) {
-      this.props.removeAttributes(value);
+  attHandle = (value, currentAttrId) => {
+    const copyAttrSelected = this.props.selectedAttr;
+    let newAttrSelected = [];
+    let found = false;
+    if (copyAttrSelected.length > 0) {
+      copyAttrSelected.forEach(function (m) {
+        for (const key in m) {
+          if (currentAttrId === key) {
+            const obj = { [key]: value };
+            newAttrSelected.push(obj);
+            found = true;
+            //JO ADD KIA WO PEHLE SE THA
+          } else {
+            //JO ADD KIA WO NAHI MILA
+            newAttrSelected.push(m);
+          }
+        }
+      });
+      if (!found) {
+        const obj = { [currentAttrId]: value };
+        newAttrSelected.push(obj);
+      }
+      this.setState({ selectedAttr: [...newAttrSelected] });
+      this.props.attrHandle([...newAttrSelected]);
     } else {
-      this.props.addAttributes(value);
+      const obj = { [currentAttrId]: value };
+      newAttrSelected.push(obj);
+      this.setState({ selectedAttr: [...newAttrSelected] });
+      this.props.attrHandle([...newAttrSelected]);
     }
   };
 
+  isAttrSelected(attrId, itemId) {
+    let isActive = false;
+    console.log(`Class Active Wala ${JSON.stringify(this.state.selectedAttr)}`);
+    if (this.props.selectedAttr.length > 0) {
+      this.props.selectedAttr.forEach(function (m) {
+        for (const key in m) {
+          if (attrId === key) {
+            console.log(`Attributes matched ${attrId}`);
+            if (m[key] === itemId) {
+              console.log(`Item matched ${m[key]}`);
+              isActive = true;
+              return isActive;
+            }
+          }
+        }
+      });
+      return isActive;
+    } else {
+      return isActive;
+    }
+  }
+
   render() {
+    console.log(this.state.data);
     const id = this.props.id;
     const product = this.props.data.find((pro) => pro.id === id);
-
-    const { name, gallery, brand, attributes, prices, description } = product;
+    const { name, gallery, brand, attributes, prices, description, inStock } =
+      product;
 
     //Currency Logic
     let currencyChange = this.props.currencyChange;
@@ -101,7 +155,7 @@ class ProductDetails extends React.Component {
                       src={img && img}
                       alt={img}
                       width="100%"
-                      height="100px"
+                      height="100%"
                       key={index}
                       onClick={() => this.handleTab(index)}
                     />
@@ -113,8 +167,8 @@ class ProductDetails extends React.Component {
             <img
               src={gallery && gallery[this.state.index]}
               alt={gallery}
-              width="80%"
-              height="80%"
+              width="100%"
+              height="100%"
             />
           </div>
           <div className="ProductDetailsContent">
@@ -122,6 +176,7 @@ class ProductDetails extends React.Component {
             <div className="SubTitle">{brand}</div>
             {attributes &&
               attributes.map((att) => {
+                const currentAttrId = att.id;
                 return (
                   <>
                     <div className="Size" key={att.id}>
@@ -132,13 +187,15 @@ class ProductDetails extends React.Component {
                         {att.items.map((item) => {
                           return (
                             <div
-                              className={`SizeBlock ${
-                                this.props.attSelected.includes(item.value)
-                                  ? "ActiveColor"
+                              className={`SizeBlock  ${
+                                this.isAttrSelected(currentAttrId, item.id)
+                                  ? " ActiveColor"
                                   : ""
                               } `}
                               key={item.id}
-                              onClick={() => this.attHandle(item.value)}
+                              onClick={() =>
+                                this.attHandle(item.id, currentAttrId)
+                              }
                               style={{
                                 background: item.value,
                                 color: item.value,
@@ -155,12 +212,14 @@ class ProductDetails extends React.Component {
                           return (
                             <div
                               className={`SizeBlock ${
-                                this.props.attSelected.includes(item.value)
-                                  ? "ActiveSize"
+                                this.isAttrSelected(currentAttrId, item.id)
+                                  ? " ActiveSize"
                                   : ""
-                              } `}
+                              }`}
                               key={item.id}
-                              onClick={() => this.attHandle(item.value)}
+                              onClick={() =>
+                                this.attHandle(item.id, currentAttrId)
+                              }
                               style={{
                                 background: item.value,
                                 color: item.value,
@@ -177,14 +236,18 @@ class ProductDetails extends React.Component {
               })}
             <div className="PriceTitle">PRICE:</div>
             <div className="Price">{price()}</div>
-            <div className="ContentButton">
+            {inStock ? (
               <div
-                className="BtnText"
                 onClick={() => this.handleAddToCart(product)}
+                className="ContentButton"
               >
-                ADD TO CART
+                <div className="BtnText">ADD TO CART</div>
               </div>
-            </div>
+            ) : (
+              <div className="DisabledContentButton">
+                <div className="BtnText">ADD TO CART</div>
+              </div>
+            )}
             <div className="DescContainer">
               <div className="DescText">{this.removeHTML(description)}</div>
             </div>
@@ -198,12 +261,11 @@ class ProductDetails extends React.Component {
 function mapStateToProps(state) {
   return {
     currencyChange: state.cart.currencyChange,
-    attSelected: state.attributes.attSelected,
+    selectedAttr: state.cart.attrSelected,
   };
 }
 export default connect(mapStateToProps, {
   addToCart,
   getTotal,
-  addAttributes,
-  removeAttributes,
+  attrHandle,
 })(usingHooks(ProductDetails));

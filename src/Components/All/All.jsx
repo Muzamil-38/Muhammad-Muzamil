@@ -3,9 +3,10 @@ import "./All.css";
 import { FiShoppingCart } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
-import {productsQuery} from "../../Queries";
+import { productsQuery } from "../../Queries";
+import { addToCart } from "../../Redux/cartSlice";
 
-class All extends React.Component {
+class All extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -78,9 +79,27 @@ class All extends React.Component {
               return (
                 <>
                   {val.inStock ? (
-                    <div className="ProductContent" key={index}>
-                      <div className="ProductBox">
-                        <div className="ImageContainer">
+                    <div className="ProductBox">
+                      <div className="ImageContainer">
+                        <Link
+                          style={{ textDecoration: "none", color: "black" }}
+                          to={"/" + val.id}
+                        >
+                          <img src={val.gallery[0]} alt="img" className="Img" />
+                        </Link>
+                        <div className="CartIconContainer">
+                          <div className="CartBtn">
+                            <FiShoppingCart color="white" />
+                          </div>
+                        </div>
+                      </div>
+                      <h2 className="ProductTitle">{val.name}</h2>
+                      {price(val)}
+                    </div>
+                  ) : (
+                    <div className="ProductContent" key={val.id}>
+                      <div>
+                        <div>
                           <Link
                             style={{ textDecoration: "none", color: "black" }}
                             to={"/" + val.id}
@@ -91,21 +110,6 @@ class All extends React.Component {
                               className="Img"
                             />
                           </Link>
-                          <div className="CartIconContainer">
-                            <Link to="/cart" className="CartBtn">
-                              <FiShoppingCart color="white" />
-                            </Link>
-                          </div>
-                        </div>
-                        <h2 className="ProductTitle">{val.name}</h2>
-                        {price(val)}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="ProductContent" key={val.id}>
-                      <div>
-                        <div>
-                          <img src={val.gallery[0]} alt="img" className="Img" />
                           <div>
                             <FiShoppingCart color="white" />
                           </div>
@@ -128,7 +132,8 @@ class All extends React.Component {
 function mapStateToProps(state) {
   return {
     currencyChange: state.cart.currencyChange,
+    selectedAttr: state.cart.attrSelected,
   };
 }
 
-export default connect(mapStateToProps, null)(All);
+export default connect(mapStateToProps, { addToCart })(All);

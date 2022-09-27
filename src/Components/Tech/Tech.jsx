@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { productsQuery } from "../../Queries";
 import { connect } from "react-redux";
 
-class Tech extends React.Component {
+class Tech extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -79,59 +79,48 @@ class Tech extends React.Component {
             products.map((val, index) => {
               return (
                 <>
-                  {val.category === "clothes" ? null : (
-                    <div>
-                      {val.inStock ? (
-                        <div className="ProductContent" key={index}>
-                          <div className="ProductBox">
-                            <div className="ImageContainer">
-                              <Link
-                                style={{
-                                  textDecoration: "none",
-                                  color: "black",
-                                }}
-                                to={"/" + val.id}
-                              >
-                                <img
-                                  src={val.gallery[0]}
-                                  alt="img"
-                                  className="Img"
-                                />
-                              </Link>
-                              <div
-                                className="CartIconContainer"
-                                // onClick={() => this.handleCart(val)}
-                              >
-                                <Link to="/cart" className="CartBtn">
-                                  <FiShoppingCart color="white" />
-                                </Link>
-                              </div>
-                            </div>
-                            <h2 className="ProductTitle">{val.name}</h2>
-                            <div className="Price">{price(val)}</div>
-                          </div>
+                  {val.inStock ? (
+                    <div className="ProductBox">
+                      <div className="ImageContainer">
+                        <Link
+                          style={{ textDecoration: "none", color: "black" }}
+                          to={"/" + val.id}
+                        >
+                          <img src={val.gallery[0]} alt="img" className="Img" />
+                        </Link>
+                        <div className="CartIconContainer">
+                          <Link to="/cart" className="CartBtn">
+                            <FiShoppingCart color="white" />
+                          </Link>
                         </div>
-                      ) : (
-                        <div className="ProductContent" key={val.id}>
-                          <div>
-                            <div>
-                              <img
-                                src={val.gallery[0]}
-                                alt="img"
-                                className="Img"
-                              />
-                              <div>
-                                <FiShoppingCart color="white" />
-                              </div>
-                            </div>
-                            <h2 className="ProductTitle">{val.name}</h2>
-                            <div className="Price">{price(val)}</div>
-                          </div>
-                          <div className="StockStatus">Out of Stock</div>
-                        </div>
-                      )}
+                      </div>
+                      <h2 className="ProductTitle">{val.name}</h2>
+                      {price(val)}
                     </div>
-                  )}{" "}
+                  ) : (
+                    <div className="ProductContent" key={val.id}>
+                      <div>
+                        <div>
+                          <Link
+                            style={{ textDecoration: "none", color: "black" }}
+                            to={"/" + val.id}
+                          >
+                            <img
+                              src={val.gallery[0]}
+                              alt="img"
+                              className="Img"
+                            />
+                          </Link>
+                          <div>
+                            <FiShoppingCart color="white" />
+                          </div>
+                        </div>
+                        <h2 className="ProductTitle">{val.name}</h2>
+                        {price(val)}
+                      </div>
+                      <div className="StockStatus">Out of Stock</div>
+                    </div>
+                  )}
                 </>
               );
             })}

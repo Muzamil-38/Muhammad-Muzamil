@@ -2,10 +2,10 @@ import React from "react";
 import "./Clothes.css";
 import { FiShoppingCart } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import {productsQuery} from "../../Queries";
+import { productsQuery } from "../../Queries";
 import { connect } from "react-redux";
 
-class Clothes extends React.Component {
+class Clothes extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -69,68 +69,55 @@ class Clothes extends React.Component {
     };
     return (
       <div className="SectionContainer">
-        <h1 className="SectionTitle">{this.state.data.name && this.state.data.name}</h1>
+        <h1 className="SectionTitle">
+          {this.state.data.name && this.state.data.name}
+        </h1>
 
         <div className="ProductSection">
           {products &&
             products.map((val, index) => {
               return (
                 <>
-                  {val.category === "tech" ? null : (
-                    <div>
-                      {val.inStock ? (
-                        <div className="ProductContent" key={index}>
-                          <div className="ProductBox">
-                            <div className="ImageContainer">
-                              <Link
-                                style={{
-                                  textDecoration: "none",
-                                  color: "black",
-                                }}
-                                to={"/" + val.id}
-                              >
-                                <img
-                                  src={val.gallery[0]}
-                                  alt="img"
-                                  className="Img"
-                                />
-                              </Link>
-                              <div
-                                className="CartIconContainer"
-                                // onClick={() => this.handleCart(val)}
-                              >
-                                <Link to="/cart" className="CartBtn">
-                                  <FiShoppingCart color="white" />
-                                </Link>
-                              </div>
-                            </div>
-                            <h2 className="ProductTitle">{val.name}</h2>
-                            <div className="Price">
-                            {price(val)}
-                            </div>
-                          </div>
+                  {val.inStock ? (
+                    <div className="ProductBox">
+                      <div className="ImageContainer">
+                        <Link
+                          style={{ textDecoration: "none", color: "black" }}
+                          to={"/" + val.id}
+                        >
+                          <img src={val.gallery[0]} alt="img" className="Img" />
+                        </Link>
+                        <div className="CartIconContainer">
+                          <Link to="/cart" className="CartBtn">
+                            <FiShoppingCart color="white" />
+                          </Link>
                         </div>
-                      ) : (
-                        <div className="ProductContent" key={val.id}>
+                      </div>
+                      <h2 className="ProductTitle">{val.name}</h2>
+                      {price(val)}
+                    </div>
+                  ) : (
+                    <div className="ProductContent" key={val.id}>
+                      <div>
+                        <div>
+                          <Link
+                            style={{ textDecoration: "none", color: "black" }}
+                            to={"/" + val.id}
+                          >
+                            <img
+                              src={val.gallery[0]}
+                              alt="img"
+                              className="Img"
+                            />
+                          </Link>
                           <div>
-                            <div>
-                              <img
-                                src={val.gallery[0]}
-                                alt="img"
-                                className="Img"
-                              />
-                              <div>
-                                <FiShoppingCart color="white" />
-                              </div>
-                            </div>
-                            <h2 className="ProductTitle">{val.name}</h2>
-                            <div className="Price">
-                            {price(val)}
-                            </div>
+                            <FiShoppingCart color="white" />
                           </div>
-                          <div className="StockStatus">Out of Stock</div>
                         </div>
-                      )}
+                        <h2 className="ProductTitle">{val.name}</h2>
+                        {price(val)}
+                      </div>
+                      <div className="StockStatus">Out of Stock</div>
                     </div>
                   )}
                 </>

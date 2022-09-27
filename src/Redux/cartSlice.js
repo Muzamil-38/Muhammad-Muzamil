@@ -5,12 +5,16 @@ const initialState = {
   cartTotalQuantity: 0,
   cartTotalAmount: 0,
   currencyChange: "$",
+  attrSelected: [],
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    attrHandle(state, action) {
+      state.attrSelected = action.payload;
+    },
     addToCart(state, action) {
       const itemIndex = state.cartItems.findIndex(
         (item) => item.id === action.payload.id
@@ -21,6 +25,24 @@ const cartSlice = createSlice({
         const tempProduct = { ...action.payload, cartQuantity: 1 };
         state.cartItems.push(tempProduct);
       }
+      // for(i=0;i<state.cartItems.length;i++){
+      //   //check for product id
+      //   if(action.payload.product.id === state.cartItems[i].product.id){
+      //     //check for attr id
+      //     for(j=0;j<state.cartItems[i].selectedAttr.length;j++){
+      //       for(k=0;k<action.payload.selectedAttr.length;k++){
+      //         //check for item id if attr are same
+      //         if(action.payload.selectedAttr[k].att===state.cartItems[i].selectedAttr[j]){
+      //           //check item id
+      //           for(const key in m){
+
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
+      // }
+      // state.cartItems.push(action.payload);
     },
     decreaseCart(state, action) {
       const itemIndex = state.cartItems.findIndex(
@@ -38,7 +60,7 @@ const cartSlice = createSlice({
     getCurrency(state, action) {
       state.currencyChange = action.payload;
     },
-    getTotal(state, action) {
+    getTotal(state) {
       let { total, quantity } = state.cartItems.reduce(
         (cartTotal, cartItem) => {
           if (state.currencyChange === "$") {
@@ -77,6 +99,6 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, decreaseCart, getTotal, getCurrency } =
+export const { addToCart, decreaseCart, getTotal, getCurrency, attrHandle } =
   cartSlice.actions;
 export default cartSlice.reducer;

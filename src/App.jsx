@@ -7,7 +7,6 @@ import Tech from "./Components/Tech/Tech";
 import ProductDetails from "./Components/ProductDetails/ProductDetails";
 import Cart from "./Components/Cart/Cart";
 import { productsQuery } from "../src/Queries";
-
 class App extends React.Component {
   constructor(props) {
     super(props);
