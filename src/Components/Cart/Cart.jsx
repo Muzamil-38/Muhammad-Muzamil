@@ -1,7 +1,6 @@
 import React from "react";
 import "./Cart.css";
-import leftArrow from "../../assets/leftArrow.png";
-import rightArrow from "../../assets/rightArrow.png";
+
 import { connect } from "react-redux";
 import {
   decreaseCart,
@@ -10,6 +9,7 @@ import {
   getTotalAmount,
 } from "../../Redux/cartSlice";
 import { Cartprice } from "../../Global_Functions/PriceFunction";
+import CartImageSlider from "./CartImageSlider";
 
 class Cart extends React.PureComponent {
   constructor(props) {
@@ -142,52 +142,7 @@ class Cart extends React.PureComponent {
                     -
                   </div>
                 </div>
-                <div className="CartImageContainer">
-                  <div className="CartImage">
-                    <img
-                      src={product.product.gallery[this.state.imageIndex]}
-                      alt="Loading..."
-                      width="200px"
-                      height="250px"
-                    />
-                    <div className="LeftRightContainer">
-                      <img
-                        src={leftArrow}
-                        alt="shoes"
-                        width="15px"
-                        onClick={() => {
-                          if (this.state.imageIndex !== 0) {
-                            this.setState({
-                              imageIndex: this.state.imageIndex - 1,
-                            });
-                          } else if (this.state.imageIndex === 0) {
-                            this.setState({
-                              imageIndex: product.product.gallery.length - 1,
-                            });
-                          }
-                        }}
-                      />
-                      &nbsp;
-                      <img
-                        src={rightArrow}
-                        alt="shoes"
-                        width="15px"
-                        onClick={() => {
-                          if (
-                            this.state.imageIndex <
-                            product.product.gallery.length - 1
-                          ) {
-                            this.setState({
-                              imageIndex: this.state.imageIndex + 1,
-                            });
-                          } else {
-                            this.setState({ imageIndex: 0 });
-                          }
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <CartImageSlider gallery={product.product.gallery}/>
               </div>
               <hr />
             </div>

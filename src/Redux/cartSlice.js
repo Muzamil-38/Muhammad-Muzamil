@@ -55,7 +55,7 @@ const cartSlice = createSlice({
     },
     decreaseCart(state, action) {
       let found = 0;
-      let addNew = true;
+      let decrease = false;
       let newCartArray = [];
       for (let i = 0; i < state.cartItems.length; i++) {
         //check for product id
@@ -79,38 +79,20 @@ const cartSlice = createSlice({
             }
           }
         }
-
-        if (found !== action.payload.selectedAttr.length) {
-          found = 0;
-        } else if (
-          found === action.payload.selectedAttr.length &&
-          state.cartItems[i].product.id === action.payload.product.id
-        ) {
-          addNew = false;
+        if (found === action.payload.selectedAttr.length) {
+          decrease = true;
           state.cartItems[i].cartQuantity -= 1;
           if (state.cartItems[i].cartQuantity > 0) {
-            console.log(`Before pushing in cart ${state.cartItems.length}`);
-            // newCartArray.push(state.cartItems[i]);
-            newCartArray.push(...state.cartItems);
-            // console.log(`After pushing in cart ${JSON.stringify(state.cartItems[i])}`);
-            console.log(`After pushing in cart ${newCartArray.length}`);
+            newCartArray.push(state.cartItems[i]);
           }
-          
-          break;
         }
+        if (!decrease) {
+          newCartArray.push(state.cartItems[i]);
+        }
+        decrease = false;
+        found = 0;
       }
-      
-      if (found !== action.payload.selectedAttr.length || addNew) {
-        console.log(`After pushing in cart ${newCartArray.length}`);
-        state.cartItems.remove(action.payload);
-        console.log(`after pushing in cart action load ${action.payload}`);
-        newCartArray.remove(action.payload);
-        console.log(`After pushing in cart action load ${action.payload}`);
-      }
-      console.log(`Before FInal in cart ${state.cartItems}`);
-      console.log(`Before FInal in cart ${newCartArray}`);
       state.cartItems = newCartArray;
-      console.log(`After FInal in cart ${state.cartItems}`);
     },
 
     getCurrency(state, action) {
