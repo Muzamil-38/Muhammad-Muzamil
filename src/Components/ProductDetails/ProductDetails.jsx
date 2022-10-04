@@ -1,8 +1,9 @@
 import React from "react";
 import "./ProductDetails.css";
 import { connect } from "react-redux";
-import { addToCart, getTotal, attrHandle } from "../../Redux/cartSlice";
+import { addToCart, getTotalCartQuantity,getTotalAmount } from "../../Redux/cartSlice";
 import { useParams } from "react-router";
+import { price } from "../../Global_Functions/PriceFunction";
 
 function usingHooks(ProductDetails) {
   return function WrappedComponent(props) {
@@ -18,18 +19,22 @@ class ProductDetails extends React.PureComponent {
     this.state = {
       index: 0,
       selectedAttr: [],
-      data: [],
     };
   }
   state = {};
 
   handleAddToCart = (product) => {
-    if (this.props.selectedAttr.length === 0) {
+    if (this.state.selectedAttr.length === 0) {
       alert("Kindly Select Attributes");
     } else {
-      this.props.addToCart(product);
-      this.props.getTotal();
+      this.props.addToCart({
+        product: product,
+        selectedAttr: this.state.selectedAttr,
+        cartQuantity: 1,
+      });
+      this.props.getTotalCartQuantity();
     }
+    this.props.getTotalAmount();
   };
 
   removeHTML = (str) => {
@@ -43,53 +48,48 @@ class ProductDetails extends React.PureComponent {
   };
 
   attHandle = (value, currentAttrId) => {
-    const copyAttrSelected = this.props.selectedAttr;
+    const copyAttrSelected = this.state.selectedAttr;
     let newAttrSelected = [];
     let found = false;
+    //loop for check if length greater than 0
     if (copyAttrSelected.length > 0) {
-      copyAttrSelected.forEach(function (m) {
-        for (const key in m) {
-          if (currentAttrId === key) {
-            const obj = { [key]: value };
-            newAttrSelected.push(obj);
-            found = true;
-            //JO ADD KIA WO PEHLE SE THA
-          } else {
-            //JO ADD KIA WO NAHI MILA
-            newAttrSelected.push(m);
-          }
+      //check all attr ID if match
+
+      for (let i = 0; i < copyAttrSelected.length; i++) {
+        if (currentAttrId === copyAttrSelected[i].attrId) {
+          const obj = { attrId: currentAttrId, itemId: value };
+          newAttrSelected.push(obj);
+          found = true;
+          //JO ADD KIA WO PEHLE SE THA
+        } else {
+          //JO ADD KIA WO NAHI MILA
+          newAttrSelected.push(copyAttrSelected[i]);
         }
-      });
+      }
+
       if (!found) {
-        const obj = { [currentAttrId]: value };
+        const obj = { attrId: currentAttrId, itemId: value };
         newAttrSelected.push(obj);
       }
       this.setState({ selectedAttr: [...newAttrSelected] });
-      this.props.attrHandle([...newAttrSelected]);
     } else {
-      const obj = { [currentAttrId]: value };
+      const obj = { attrId: currentAttrId, itemId: value };
       newAttrSelected.push(obj);
       this.setState({ selectedAttr: [...newAttrSelected] });
-      this.props.attrHandle([...newAttrSelected]);
     }
   };
 
   isAttrSelected(attrId, itemId) {
     let isActive = false;
-    console.log(`Class Active Wala ${JSON.stringify(this.state.selectedAttr)}`);
-    if (this.props.selectedAttr.length > 0) {
-      this.props.selectedAttr.forEach(function (m) {
-        for (const key in m) {
-          if (attrId === key) {
-            console.log(`Attributes matched ${attrId}`);
-            if (m[key] === itemId) {
-              console.log(`Item matched ${m[key]}`);
-              isActive = true;
-              return isActive;
-            }
+    if (this.state.selectedAttr.length > 0) {
+      for (let i = 0; i < this.state.selectedAttr.length; i++) {
+        if (attrId === this.state.selectedAttr[i].attrId) {
+          if (this.state.selectedAttr[i].itemId === itemId) {
+            isActive = true;
+            return isActive;
           }
         }
-      });
+      }
       return isActive;
     } else {
       return isActive;
@@ -97,52 +97,13 @@ class ProductDetails extends React.PureComponent {
   }
 
   render() {
-    console.log(this.state.data);
     const id = this.props.id;
     const product = this.props.data.find((pro) => pro.id === id);
-    const { name, gallery, brand, attributes, prices, description, inStock } =
-      product;
+    const { name, gallery, brand, attributes, description, inStock } = product;
 
     //Currency Logic
     let currencyChange = this.props.currencyChange;
 
-    function price() {
-      if (currencyChange === "$")
-        return (
-          <div className="Price">
-            {prices[0].currency.symbol}&nbsp;
-            {prices[0].amount}
-          </div>
-        );
-      else if (currencyChange === "£")
-        return (
-          <div className="Price">
-            {prices[1].currency.symbol}&nbsp;
-            {prices[1].amount}
-          </div>
-        );
-      else if (currencyChange === "A$")
-        return (
-          <div className="Price">
-            {prices[2].currency.symbol}&nbsp;
-            {prices[2].amount}
-          </div>
-        );
-      else if (currencyChange === "¥")
-        return (
-          <div className="Price">
-            {prices[3].currency.symbol}&nbsp;
-            {prices[3].amount}
-          </div>
-        );
-      else if (currencyChange === "₽")
-        return (
-          <div className="Price">
-            {prices[4].currency.symbol}&nbsp;
-            {prices[4].amount}
-          </div>
-        );
-    }
     return (
       <>
         <div className="ProductDetails">
@@ -235,7 +196,7 @@ class ProductDetails extends React.PureComponent {
                 );
               })}
             <div className="PriceTitle">PRICE:</div>
-            <div className="Price">{price()}</div>
+            <div className="Price">{price(currencyChange, product)}</div>
             {inStock ? (
               <div
                 onClick={() => this.handleAddToCart(product)}
@@ -266,6 +227,6 @@ function mapStateToProps(state) {
 }
 export default connect(mapStateToProps, {
   addToCart,
-  getTotal,
-  attrHandle,
+  getTotalCartQuantity,
+  getTotalAmount
 })(usingHooks(ProductDetails));

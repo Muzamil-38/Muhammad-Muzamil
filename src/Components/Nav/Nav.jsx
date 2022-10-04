@@ -31,6 +31,97 @@ class Nav extends React.PureComponent {
       .then((data) => this.setState({ data: data.data.currencies }));
   }
 
+  renderNavbarLinks = () => (
+    <nav>
+      <li>
+        <NavLink
+          className="navLink"
+          style={({ isActive }) => ({
+            color: isActive ? "green" : "black",
+          })}
+          to="/"
+        >
+          ALL
+        </NavLink>
+      </li>
+      <li>
+        <NavLink
+          className="navLink"
+          style={({ isActive }) => ({
+            color: isActive ? "green" : "black",
+          })}
+          to="/clothes"
+        >
+          CLOTHES
+        </NavLink>
+      </li>
+      <li>
+        <NavLink
+          className="navLink"
+          style={({ isActive }) => ({
+            color: isActive ? "green" : "black",
+          })}
+          to="/tech"
+        >
+          TECH
+        </NavLink>
+      </li>
+    </nav>
+  );
+
+  renderNavbarCenter = () => (
+    <div className="Center">
+      <Link style={{ textDecoration: "none" }} to="/">
+        <img src={Logo} alt="Logo" />
+      </Link>
+    </div>
+  );
+
+  renderNavbarRight = () => (
+    <div className="Right">
+      <span
+        className="IconCurrency"
+        onClick={() =>
+          this.setState({ currencyOpen: !this.state.currencyOpen }) ||
+          this.state.currencyOpen
+            ? this.setState({
+                clickArrowChange: <AiOutlineDown fontSize="0.6rem" />,
+              })
+            : this.setState({
+                clickArrowChange: <AiOutlineUp fontSize="0.6rem" />,
+              })
+        }
+      >
+        {this.props.currencyChange} &nbsp;
+        {this.state.clickArrowChange}
+      </span>
+      {this.state.currencyOpen && (
+        <div
+          className="Options"
+          value={this.props.currencyChange}
+          onClick={this.props.onCurrencyChange}
+        >
+          {this.state.data.map((cur) => (
+            <option className="OptionItem" value={cur.symbol}>
+              {cur.symbol} {cur.label}
+            </option>
+          ))}
+        </div>
+      )}
+      <span
+        className="IconCart"
+        ref={this.miniCart}
+        onClick={() => {
+          this.setState({ miniCartOpen: !this.state.miniCartOpen });
+        }}
+      >
+        <div className="CartCount">{this.props.cartTotalQuantity}</div>
+        <FiShoppingCart />
+        {this.state.miniCartOpen && <MiniCart />}
+      </span>
+    </div>
+  );
+
   render() {
     if (this.state.miniCartOpen) {
       document.body.classList.add("active-miniCartOpen");
@@ -39,88 +130,9 @@ class Nav extends React.PureComponent {
     }
     return (
       <div className="Wrapper">
-        <nav>
-          <li>
-            <NavLink
-              className="navLink"
-              style={({ isActive }) => ({
-                color: isActive ? "green" : "black",
-              })}
-              to="/"
-            >
-              ALL
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              className="navLink"
-              style={({ isActive }) => ({
-                color: isActive ? "green" : "black",
-              })}
-              to="/clothes"
-            >
-              CLOTHES
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              className="navLink"
-              style={({ isActive }) => ({
-                color: isActive ? "green" : "black",
-              })}
-              to="/tech"
-            >
-              TECH
-            </NavLink>
-          </li>
-        </nav>
-        <div className="Center">
-          <Link style={{ textDecoration: "none" }} to="/">
-            <img src={Logo} alt="Logo" />
-          </Link>
-        </div>
-        <div className="Right">
-          <span
-            className="IconCurrency"
-            onClick={() =>
-              this.setState({ currencyOpen: !this.state.currencyOpen }) ||
-              this.state.currencyOpen
-                ? this.setState({
-                    clickArrowChange: <AiOutlineDown fontSize="0.6rem" />,
-                  })
-                : this.setState({
-                    clickArrowChange: <AiOutlineUp fontSize="0.6rem" />,
-                  })
-            }
-          >
-            {this.props.currencyChange} &nbsp;
-            {this.state.clickArrowChange}
-          </span>
-          {this.state.currencyOpen && (
-            <div
-              className="Options"
-              value={this.props.currencyChange}
-              onClick={this.props.onCurrencyChange}
-            >
-              {this.state.data.map((cur) => (
-                <option className="OptionItem" value={cur.symbol}>
-                  {cur.symbol} {cur.label}
-                </option>
-              ))}
-            </div>
-          )}
-          <span
-            className="IconCart"
-            ref={this.miniCart}
-            onClick={() => {
-              this.setState({ miniCartOpen: !this.state.miniCartOpen });
-            }}
-          >
-            <div className="CartCount">{this.props.cartTotalQuantity}</div>
-            <FiShoppingCart />
-            {this.state.miniCartOpen && <MiniCart />}
-          </span>
-        </div>
+        {this.renderNavbarLinks()}
+        {this.renderNavbarCenter()}
+        {this.renderNavbarRight()}
       </div>
     );
   }
@@ -129,6 +141,7 @@ function mapStateToProps(state) {
   return {
     cartTotalQuantity: state.cart.cartTotalQuantity,
     currencyChange: state.cart.currencyChange,
+    cartQuantity: state.cart.cartItems.cartQuantity,
   };
 }
 

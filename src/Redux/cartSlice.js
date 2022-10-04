@@ -5,100 +5,162 @@ const initialState = {
   cartTotalQuantity: 0,
   cartTotalAmount: 0,
   currencyChange: "$",
-  attrSelected: [],
 };
 
 const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    attrHandle(state, action) {
-      state.attrSelected = action.payload;
-    },
     addToCart(state, action) {
-      const itemIndex = state.cartItems.findIndex(
-        (item) => item.id === action.payload.id
-      );
-      if (itemIndex >= 0) {
-        state.cartItems[itemIndex].cartQuantity += 1;
-      } else {
-        const tempProduct = { ...action.payload, cartQuantity: 1 };
-        state.cartItems.push(tempProduct);
-      }
-      // for(i=0;i<state.cartItems.length;i++){
-      //   //check for product id
-      //   if(action.payload.product.id === state.cartItems[i].product.id){
-      //     //check for attr id
-      //     for(j=0;j<state.cartItems[i].selectedAttr.length;j++){
-      //       for(k=0;k<action.payload.selectedAttr.length;k++){
-      //         //check for item id if attr are same
-      //         if(action.payload.selectedAttr[k].att===state.cartItems[i].selectedAttr[j]){
-      //           //check item id
-      //           for(const key in m){
+      let found = 0;
+      let addNew = true;
+      for (let i = 0; i < state.cartItems.length; i++) {
+        //check for product id
+        if (state.cartItems[i].product.id === action.payload.product.id) {
+          //check for attr id
+          for (let x = 0; x < state.cartItems[i].selectedAttr.length; x++) {
+            for (let y = 0; y < action.payload.selectedAttr.length; y++) {
+              //check for item id if attr are same
+              if (
+                action.payload.selectedAttr[y].attrId ===
+                state.cartItems[i].selectedAttr[x].attrId
+              ) {
+                //check item id
+                if (
+                  action.payload.selectedAttr[y].itemId ===
+                  state.cartItems[i].selectedAttr[x].itemId
+                ) {
+                  found += 1;
+                }
+              }
+            }
+          }
+        }
 
-      //           }
-      //         }
-      //       }
-      //     }
-      //   }
-      // }
-      // state.cartItems.push(action.payload);
+        if (found !== action.payload.selectedAttr.length) {
+          found = 0;
+        } else if (
+          found === action.payload.selectedAttr.length &&
+          state.cartItems[i].product.id === action.payload.product.id
+        ) {
+          addNew = false;
+          state.cartItems[i].cartQuantity += 1;
+          break;
+        }
+      }
+
+      if (found !== action.payload.selectedAttr.length || addNew) {
+        state.cartItems.push(action.payload);
+      }
     },
     decreaseCart(state, action) {
-      const itemIndex = state.cartItems.findIndex(
-        (cartItem) => cartItem.id === action.payload.id
-      );
-      if (state.cartItems[itemIndex].cartQuantity > 1) {
-        state.cartItems[itemIndex].cartQuantity -= 1;
-      } else if (state.cartItems[itemIndex].cartQuantity === 1) {
-        const nextCartItems = state.cartItems.filter(
-          (cartItem) => cartItem.id !== action.payload.id
-        );
-        state.cartItems = nextCartItems;
+      let found = 0;
+      let addNew = true;
+      let newCartArray = [];
+      for (let i = 0; i < state.cartItems.length; i++) {
+        //check for product id
+        if (state.cartItems[i].product.id === action.payload.product.id) {
+          //check for attr id
+          for (let x = 0; x < state.cartItems[i].selectedAttr.length; x++) {
+            for (let y = 0; y < action.payload.selectedAttr.length; y++) {
+              //check for item id if attr are same
+              if (
+                action.payload.selectedAttr[y].attrId ===
+                state.cartItems[i].selectedAttr[x].attrId
+              ) {
+                //check item id
+                if (
+                  action.payload.selectedAttr[y].itemId ===
+                  state.cartItems[i].selectedAttr[x].itemId
+                ) {
+                  found += 1;
+                }
+              }
+            }
+          }
+        }
+
+        if (found !== action.payload.selectedAttr.length) {
+          found = 0;
+        } else if (
+          found === action.payload.selectedAttr.length &&
+          state.cartItems[i].product.id === action.payload.product.id
+        ) {
+          addNew = false;
+          state.cartItems[i].cartQuantity -= 1;
+          if (state.cartItems[i].cartQuantity > 0) {
+            console.log(`Before pushing in cart ${state.cartItems.length}`);
+            // newCartArray.push(state.cartItems[i]);
+            newCartArray.push(...state.cartItems);
+            // console.log(`After pushing in cart ${JSON.stringify(state.cartItems[i])}`);
+            console.log(`After pushing in cart ${newCartArray.length}`);
+          }
+          
+          break;
+        }
       }
+      
+      if (found !== action.payload.selectedAttr.length || addNew) {
+        console.log(`After pushing in cart ${newCartArray.length}`);
+        state.cartItems.remove(action.payload);
+        console.log(`after pushing in cart action load ${action.payload}`);
+        newCartArray.remove(action.payload);
+        console.log(`After pushing in cart action load ${action.payload}`);
+      }
+      console.log(`Before FInal in cart ${state.cartItems}`);
+      console.log(`Before FInal in cart ${newCartArray}`);
+      state.cartItems = newCartArray;
+      console.log(`After FInal in cart ${state.cartItems}`);
     },
+
     getCurrency(state, action) {
       state.currencyChange = action.payload;
     },
-    getTotal(state) {
-      let { total, quantity } = state.cartItems.reduce(
-        (cartTotal, cartItem) => {
-          if (state.currencyChange === "$") {
-            const { prices, cartQuantity } = cartItem;
-            const itemTotal = prices[0].amount * cartQuantity;
-            cartTotal.total += itemTotal;
-            cartTotal.quantity += cartQuantity;
-          } else if (state.currencyChange === "£") {
-            const { prices, cartQuantity } = cartItem;
-            const itemTotal = prices[1].amount * cartQuantity;
-            cartTotal.total += itemTotal;
-            cartTotal.quantity += cartQuantity;
-          } else if (state.currencyChange === "A$") {
-            const { prices, cartQuantity } = cartItem;
-            const itemTotal = prices[2].amount * cartQuantity;
-            cartTotal.total += itemTotal;
-            cartTotal.quantity += cartQuantity;
-          } else if (state.currencyChange === "¥") {
-            const { prices, cartQuantity } = cartItem;
-            const itemTotal = prices[3].amount * cartQuantity;
-            cartTotal.total += itemTotal;
-            cartTotal.quantity += cartQuantity;
-          } else if (state.currencyChange === "₽") {
-            const { prices, cartQuantity } = cartItem;
-            const itemTotal = prices[4].amount * cartQuantity;
-            cartTotal.total += itemTotal;
-            cartTotal.quantity += cartQuantity;
-          }
-          return cartTotal;
-        },
-        { total: 0, quantity: 0 }
-      );
-      state.cartTotalQuantity = quantity;
-      state.cartTotalAmount = total;
+    getTotalCartQuantity(state) {
+      let TotalQuantity = 0;
+      for (let i = 0; i < state.cartItems.length; i++) {
+        TotalQuantity += state.cartItems[i].cartQuantity;
+      }
+      state.cartTotalQuantity = TotalQuantity;
+    },
+    getTotalAmount(state) {
+      let amount = 0;
+      let totalAmount = 0;
+      for (let i = 0; i < state.cartItems.length; i++) {
+        if (state.currencyChange === "$") {
+          amount =
+            state.cartItems[i].product.prices[0].amount *
+            state.cartItems[i].cartQuantity;
+        } else if (state.currencyChange === "£") {
+          amount =
+            state.cartItems[i].product.prices[1].amount *
+            state.cartItems[i].cartQuantity;
+        } else if (state.currencyChange === "A$") {
+          amount =
+            state.cartItems[i].product.prices[2].amount *
+            state.cartItems[i].cartQuantity;
+        } else if (state.currencyChange === "¥") {
+          amount =
+            state.cartItems[i].product.prices[3].amount *
+            state.cartItems[i].cartQuantity;
+        } else if (state.currencyChange === "₽") {
+          amount =
+            state.cartItems[i].product.prices[4].amount *
+            state.cartItems[i].cartQuantity;
+        }
+        totalAmount += amount;
+      }
+
+      state.cartTotalAmount = totalAmount;
     },
   },
 });
 
-export const { addToCart, decreaseCart, getTotal, getCurrency, attrHandle } =
-  cartSlice.actions;
+export const {
+  addToCart,
+  decreaseCart,
+  getTotalCartQuantity,
+  getCurrency,
+  getTotalAmount,
+} = cartSlice.actions;
 export default cartSlice.reducer;

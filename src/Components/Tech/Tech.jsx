@@ -4,6 +4,8 @@ import { FiShoppingCart } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { productsQuery } from "../../Queries";
 import { connect } from "react-redux";
+import { addToCart,getTotalCartQuantity } from "../../Redux/cartSlice";
+import { price } from "../../Global_Functions/PriceFunction";
 
 class Tech extends React.PureComponent {
   constructor(props) {
@@ -22,52 +24,83 @@ class Tech extends React.PureComponent {
       .then((res) => res.json())
       .then((data) => this.setState({ data: data.data.categories[2] }));
   }
-  handleCart = (product) => {
-    this.props.add(product);
+
+  //Add to Cart
+  handleAddToCart = (product) => {
+    console.log(product);
+    const selectedAttrArray = [];
+    for (let i = 0; i < product.attributes.length; i++) {
+      selectedAttrArray.push({
+        attrId: product.attributes[i].id,
+        itemId: product.attributes[i].items[0].id,
+      });
+    }
+    this.props.addToCart({
+      product: product,
+      selectedAttr: selectedAttrArray,
+      cartQuantity: 1,
+    });
+    this.props.getTotalCartQuantity();
+  };
+
+  //Instock Products
+  renderInstockProduct = (val) => {
+    let currencyChange = this.props.currencyChange;
+
+    return (
+      <div className="ProductBox">
+        <div className="ImageContainer">
+          <Link
+            style={{ textDecoration: "none", color: "black" }}
+            to={"/" + val.id}
+          >
+            <img src={val.gallery[0]} alt="img" className="Img" />
+          </Link>
+          <div
+            className="CartIconContainer"
+            onClick={() => this.handleAddToCart(val)}
+          >
+            <div className="CartBtn">
+              <FiShoppingCart color="white" />
+            </div>
+          </div>
+        </div>
+        <h2 className="ProductTitle">{val.name}</h2>
+        {price(currencyChange, val)}
+      </div>
+    );
+  };
+
+  //Out of Stock Products
+  renderOutStockProduct = (val) => {
+    let currencyChange = this.props.currencyChange;
+
+    return (
+      <div className="ProductContent" key={val.id}>
+        <div>
+          <div>
+            <Link
+              style={{ textDecoration: "none", color: "black" }}
+              to={"/" + val.id}
+            >
+              <img src={val.gallery[0]} alt="img" className="Img" />
+            </Link>
+            <div>
+              <FiShoppingCart color="white" />
+            </div>
+          </div>
+          <h2 className="ProductTitle">{val.name}</h2>
+          {price(currencyChange, val)}
+        </div>
+        <div className="StockStatus">Out of Stock</div>
+      </div>
+    );
   };
 
   render() {
     let products = this.state.data.products;
-    //Currency Logic
-    let currencyChange = this.props.currencyChange;
 
-    const price = (val) => {
-      if (currencyChange === "$")
-        return (
-          <div className="Price">
-            {val.prices[0].currency.symbol}
-            {val.prices[0].amount}
-          </div>
-        );
-      else if (currencyChange === "£")
-        return (
-          <div className="Price">
-            {val.prices[1].currency.symbol}
-            {val.prices[1].amount}
-          </div>
-        );
-      else if (currencyChange === "A$")
-        return (
-          <div className="Price">
-            {val.prices[2].currency.symbol}
-            {val.prices[2].amount}
-          </div>
-        );
-      else if (currencyChange === "¥")
-        return (
-          <div className="Price">
-            {val.prices[3].currency.symbol}
-            {val.prices[3].amount}
-          </div>
-        );
-      else if (currencyChange === "₽")
-        return (
-          <div className="Price">
-            {val.prices[4].currency.symbol}
-            {val.prices[4].amount}
-          </div>
-        );
-    };
+    //Main Render
     return (
       <div className="SectionContainer">
         <h1 className="SectionTitle">
@@ -76,51 +109,12 @@ class Tech extends React.PureComponent {
 
         <div className="ProductSection">
           {products &&
-            products.map((val, index) => {
+            products.map((val) => {
               return (
                 <>
-                  {val.inStock ? (
-                    <div className="ProductBox">
-                      <div className="ImageContainer">
-                        <Link
-                          style={{ textDecoration: "none", color: "black" }}
-                          to={"/" + val.id}
-                        >
-                          <img src={val.gallery[0]} alt="img" className="Img" />
-                        </Link>
-                        <div className="CartIconContainer">
-                          <Link to="/cart" className="CartBtn">
-                            <FiShoppingCart color="white" />
-                          </Link>
-                        </div>
-                      </div>
-                      <h2 className="ProductTitle">{val.name}</h2>
-                      {price(val)}
-                    </div>
-                  ) : (
-                    <div className="ProductContent" key={val.id}>
-                      <div>
-                        <div>
-                          <Link
-                            style={{ textDecoration: "none", color: "black" }}
-                            to={"/" + val.id}
-                          >
-                            <img
-                              src={val.gallery[0]}
-                              alt="img"
-                              className="Img"
-                            />
-                          </Link>
-                          <div>
-                            <FiShoppingCart color="white" />
-                          </div>
-                        </div>
-                        <h2 className="ProductTitle">{val.name}</h2>
-                        {price(val)}
-                      </div>
-                      <div className="StockStatus">Out of Stock</div>
-                    </div>
-                  )}
+                  {val.inStock
+                    ? this.renderInstockProduct(val)
+                    : this.renderOutStockProduct(val)}
                 </>
               );
             })}
@@ -133,7 +127,8 @@ class Tech extends React.PureComponent {
 function mapStateToProps(state) {
   return {
     currencyChange: state.cart.currencyChange,
+    selectedAttr: state.cart.attrSelected,
   };
 }
 
-export default connect(mapStateToProps, null)(Tech);
+export default connect(mapStateToProps, { addToCart,getTotalCartQuantity })(Tech);

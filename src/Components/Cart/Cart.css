@@ -70,31 +70,12 @@ hr {
   cursor: pointer;
 }
 
-.Gray {
-  width: 20px;
-  height: 20px;
-  background-color: gray;
-}
-
-.Black {
-  width: 20px;
-  height: 20px;
-  background-color: black;
-}
-
-.Green {
-  width: 20px;
-  height: 20px;
-  background-color: green;
-}
-
 .ActiveColor {
   border: 2.5px solid green;
 }
 
 .CartImageContainer {
   text-align: right;
- 
 }
 
 .CartImage {

@@ -2,7 +2,13 @@ import React from "react";
 import "./MiniCart.css";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import { decreaseCart, addToCart, getTotal } from "../../Redux/cartSlice";
+import {
+  decreaseCart,
+  addToCart,
+  getTotalCartQuantity,
+  getTotalAmount,
+} from "../../Redux/cartSlice";
+import { Cartprice } from "../../Global_Functions/PriceFunction";
 
 class MiniCart extends React.PureComponent {
   constructor(props) {
@@ -13,83 +19,35 @@ class MiniCart extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.props.getTotal(this.props.cart);
+    this.props.getTotalAmount();
   }
 
   handleDecreaseCart = (cartItem) => {
     this.props.decreaseCart(cartItem);
-    this.props.getTotal(this.props.cart);
+    this.props.getTotalCartQuantity();
+    this.props.getTotalAmount();
   };
 
   handleIncreaseCart = (cartItem) => {
     this.props.addToCart(cartItem);
-    this.props.getTotal(this.props.cart);
+    this.props.getTotalCartQuantity();
+    this.props.getTotalAmount();
   };
 
-  isAttrSelected(attrId, itemId) {
+  isAttrSelected(myProductAttr, attrId, itemId) {
     let isActive = false;
-    if (this.props.selectedAttr.length > 0) {
-      this.props.selectedAttr.forEach(function (m) {
-        for (const key in m) {
-          if (attrId === key) {
-            console.log(`Attributes matched ${attrId}`);
-            if (m[key] === itemId) {
-              console.log(`Item matched ${m[key]}`);
-              isActive = true;
-              return isActive;
-            }
-          }
+    for (let i = 0; i < myProductAttr.length; i++) {
+      if (attrId === myProductAttr[i].attrId) {
+        if (myProductAttr[i].itemId === itemId) {
+          isActive = true;
         }
-      });
-      return isActive;
-    } else {
-      return isActive;
+      }
     }
+    return isActive;
   }
- 
 
   render() {
-    //Currency Logic
     let currencyChange = this.props.currencyChange;
-
-    const price = (product) => {
-      if (currencyChange === "$")
-        return (
-          <div className="Price">
-            {product.prices[0].currency.symbol}&nbsp;
-            {product.prices[0].amount}
-          </div>
-        );
-      else if (currencyChange === "£")
-        return (
-          <div className="Price">
-            {product.prices[1].currency.symbol}&nbsp;
-            {product.prices[1].amount}
-          </div>
-        );
-      else if (currencyChange === "A$")
-        return (
-          <div className="Price">
-            {product.prices[2].currency.symbol}&nbsp;
-            {product.prices[2].amount}
-          </div>
-        );
-      else if (currencyChange === "¥")
-        return (
-          <div className="Price">
-            {product.prices[3].currency.symbol}&nbsp;
-            {product.prices[3].amount}
-          </div>
-        );
-      else if (currencyChange === "₽")
-        return (
-          <div className="Price">
-            {product.prices[4].currency.symbol}&nbsp;
-            {product.prices[4].amount}
-          </div>
-        );
-    };
-
     return (
       <>
         <div className="overlay">
@@ -105,87 +63,106 @@ class MiniCart extends React.PureComponent {
             {this.props.cart.length < 1 ? (
               <div className="EmptyCart">Cart is Empty</div>
             ) : (
-              this.props.cart.map((product) => (
-                <div className="MiniCartContentContainer">
-                  <div className="MiniCartContent">
-                    <div className="MiniTitle">{product.name}</div>
-                    <div className="MiniSubTitle">{product.brand}</div>
-                    <div className="MiniPrice">{price(product)}</div>
-                    {product.attributes &&
-                      product.attributes.map((att) => {
-                        const currentAttrId = att.id;
-                        return (
-                          <>
-                            <div className="MiniSize" key={att.id}>
-                              {att.name}:
-                            </div>
-                            {att.type === "swatch" ? (
-                              <div className="MiniColorBlocks">
-                                {att.items.map((item, index) => {
-                                  return (
-                                    <div
-                                      className={`MiniColorBlock ${
-                                        this.isAttrSelected(currentAttrId, item.id)
-                                      ? " ActiveMiniColor"
-                                      : ""
-                                      } `}
-                                      key={item.id}
-                                      style={{
-                                        background: item.value,
-                                        color: item.value,
-                                      }}
-                                    >
-                                      <small>{index}</small>
-                                    </div>
-                                  );
-                                })}
+              this.props.cart.map((product) => {
+                const myProductAttr = product.selectedAttr;
+                return (
+                  <div className="MiniCartContentContainer">
+                    <div className="MiniCartContent">
+                      <div className="MiniTitle">{product.product.name}</div>
+                      <div className="MiniSubTitle">
+                        {product.product.brand}
+                      </div>
+                      <div className="MiniPrice">
+                        {Cartprice(currencyChange, product)}
+                      </div>
+                      {product.product.attributes &&
+                        product.product.attributes.map((att) => {
+                          const currentAttrId = att.id;
+                          return (
+                            <>
+                              <div className="MiniSize" key={att.id}>
+                                {att.name}:
                               </div>
-                            ) : (
-                              <div className="MiniSizeBlocks">
-                                {att.items.map((item) => {
-                                  return (
-                                    <div
-                                      className={`MiniSizeBlock ${
-                                        this.isAttrSelected(currentAttrId, item.id)
-                                      ? " ActiveMiniSize"
-                                      : ""
-                                      } `}
-                                      key={item.id}
-                                      style={{
-                                        background: item.value,
-                                        color: item.value,
-                                      }}
-                                    >
-                                      <small>{item.value}</small>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </>
-                        );
-                      })}
-                  </div>
-                  <div className="MiniCountContent">
-                    <div
-                      className="MiniPlusButton"
-                      onClick={() => this.handleIncreaseCart(product)}
-                    >
-                      +
+                              {att.type === "swatch" ? (
+                                <div className="MiniColorBlocks">
+                                  {att.items.map((item, index) => {
+                                    return (
+                                      <div
+                                        className={`MiniColorBlock ${
+                                          this.isAttrSelected(
+                                            myProductAttr,
+                                            currentAttrId,
+                                            item.id
+                                          )
+                                            ? " ActiveMiniColor"
+                                            : ""
+                                        } `}
+                                        key={item.id}
+                                        style={{
+                                          background: item.value,
+                                          color: item.value,
+                                        }}
+                                      >
+                                        <small>{index}</small>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              ) : (
+                                <div className="MiniSizeBlocks">
+                                  {att.items.map((item) => {
+                                    return (
+                                      <div
+                                        className={`MiniSizeBlock ${
+                                          this.isAttrSelected(
+                                            myProductAttr,
+                                            currentAttrId,
+                                            item.id
+                                          )
+                                            ? " ActiveMiniSize"
+                                            : ""
+                                        } `}
+                                        key={item.id}
+                                        style={{
+                                          background: item.value,
+                                          color: item.value,
+                                        }}
+                                      >
+                                        <small>{item.value}</small>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </>
+                          );
+                        })}
                     </div>
-                    <div className="MiniCount">{product.cartQuantity}</div>
-                    <div
-                      className="MiniMinusButton"
-                      onClick={() => this.handleDecreaseCart(product)}
-                    >
-                      -
+                    <div className="MiniCountContent">
+                      <div
+                        className="MiniPlusButton"
+                        onClick={() => this.handleIncreaseCart(product)}
+                      >
+                        +
+                      </div>
+                      <div className="MiniCount">{product.cartQuantity}</div>
+                      <div
+                        className="MiniMinusButton"
+                        onClick={() => this.handleDecreaseCart(product)}
+                      >
+                        -
+                      </div>
+                    </div>
+                    <div className="MiniCartImageContainer">
+                      <img
+                        src={product.product.gallery[0]}
+                        alt="Error"
+                        width="100%"
+                      />
                     </div>
                   </div>
-                  <div className="MiniCartImageContainer">
-                    <img src={product.gallery[0]} alt="Error" width="100%" />
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
 
             <div className="TotalContent">
@@ -213,12 +190,12 @@ function AddToMiniCart(state) {
     cartTotalQuantity: state.cart.cartTotalQuantity,
     cartTotalAmount: state.cart.cartTotalAmount,
     currencyChange: state.cart.currencyChange,
-    selectedAttr: state.cart.attrSelected,
   };
 }
 
 export default connect(AddToMiniCart, {
   decreaseCart,
   addToCart,
-  getTotal,
+  getTotalCartQuantity,
+  getTotalAmount,
 })(MiniCart);
